@@ -1,0 +1,20 @@
+curl -X POST "https://api.mapbox.com/uploads/v1/embrandys/credentials?access_token={mapbox_token}"
+
+$env:AWS_ACCESS_KEY_ID="{klucz_dostepu}"
+$env:AWS_SECRET_ACCESS_KEY="{sekretny_klucz}"
+$env:AWS_SESSION_TOKEN="{token}"
+
+aws s3 cp T2019_KAR_POI_TABLE.zip s3://bucket/key --region us-east-1
+
+$headers = @{
+    "Content-Type" = "application/json"
+    "Cache-Control" = "no-cache"
+}
+
+$body = @{
+    url = "http://bucket.s3.amazonaws.com/key"
+    tileset = "embrandys.pois"
+    name = "POIS"
+} | ConvertTo-Json
+
+Invoke-WebRequest -Uri 'url' -Method Post -Headers $headers -Body $body
